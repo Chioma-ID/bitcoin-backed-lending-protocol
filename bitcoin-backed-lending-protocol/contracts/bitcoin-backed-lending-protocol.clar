@@ -44,4 +44,41 @@
 ;; Emergency pause switch
 (define-data-var paused bool false)
 
+;; Supported assets with configurations
+(define-map supported-assets
+  { asset-id: (string-ascii 32) }
+  {
+    token-contract: principal,
+    price-feed-contract: principal,
+    is-enabled: bool,
+    borrow-enabled: bool,
+    collateral-factor: uint,  ;; Value between 0-100, representing % of asset value usable as collateral
+    borrow-cap: uint,        ;; Maximum amount that can be borrowed
+    reserve-factor: uint     ;; Percentage of interest that goes to protocol reserves
+  }
+)
+
+;; Asset market data
+(define-map asset-markets
+  { asset-id: (string-ascii 32) }
+  {
+    total-deposits: uint,
+    total-borrows: uint,
+    total-reserves: uint,
+    supply-rate: uint,      ;; APY in basis points (e.g. 500 = 5%)
+    borrow-rate: uint,      ;; APY in basis points
+    last-update-block: uint,
+    supply-index: uint,     ;; Cumulative index for interest accrual
+    borrow-index: uint      ;; Cumulative index for interest accrual
+  }
+)
+
+;; User deposits
+(define-map user-deposits
+  { user: principal, asset-id: (string-ascii 32) }
+  {
+    balance: uint,
+    is-collateral: bool     ;; Whether this deposit is being used as collateral
+  }
+)
 
