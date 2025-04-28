@@ -1,4 +1,3 @@
-
 ;; Minimum collateralization ratio (150%)
 (define-constant MIN_COLLATERAL_RATIO u150)
 
@@ -38,3 +37,11 @@
 
 (define-constant ERR_NOT_LIQUIDATABLE u8)
 (define-constant ERR_PRICE_FEED_ERROR u9)
+
+;; Protocol owner
+(define-data-var contract-owner principal tx-sender)
+
+;; Emergency pause switch
+(define-data-var paused bool false)
+
+
