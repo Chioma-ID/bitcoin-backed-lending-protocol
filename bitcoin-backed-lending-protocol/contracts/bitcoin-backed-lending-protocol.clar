@@ -82,3 +82,23 @@
   }
 )
 
+;; User borrows
+(define-map user-borrows
+  { user: principal, asset-id: (string-ascii 32) }
+  {
+    balance: uint,
+    interest-index: uint    ;; Interest index at time of last update
+  }
+)
+
+;; Risk parameters
+(define-map risk-parameters
+  { asset-id: (string-ascii 32) }
+  {
+    volatility-factor: uint,  ;; Higher for more volatile assets
+    correlation-btc: int,     ;; Correlation with BTC (-100 to 100)
+    max-ltv: uint,            ;; Maximum loan-to-value allowed
+    liquidation-threshold: uint,  ;; Threshold that triggers liquidation
+    liquidation-penalty: uint     ;; Penalty applied during liquidation
+  }
+)
