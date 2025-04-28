@@ -102,3 +102,31 @@
     liquidation-penalty: uint     ;; Penalty applied during liquidation
   }
 )
+
+;; Price cache to limit oracle calls
+(define-map price-cache
+  { asset-id: (string-ascii 32) }
+  {
+    price: uint,
+    timestamp: uint,
+    ttl: uint
+  }
+)
+
+;; Check if caller is contract owner
+(define-private (is-contract-owner)
+  (is-eq tx-sender (var-get contract-owner))
+)
+
+;; Check if protocol is paused
+(define-private (is-paused)
+  (var-get paused)
+)
+
+;; Update contract owner
+(define-public (set-contract-owner (new-owner principal))
+  (begin
+    (asserts! (is-contract-owner) (err ERR_UNAUTHORIZED))
+    (ok (var-set contract-owner new-owner))
+  )
+)
