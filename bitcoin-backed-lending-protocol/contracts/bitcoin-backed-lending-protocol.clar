@@ -130,3 +130,46 @@
     (ok (var-set contract-owner new-owner))
   )
 )
+
+;; Emergency pause/unpause the protocol
+(define-public (set-paused (new-status bool))
+  (begin
+    (asserts! (is-contract-owner) (err ERR_UNAUTHORIZED))
+    (ok (var-set paused new-status))
+  )
+)
+
+;; Calculate interest accrual since last update
+(define-private (calculate-interest-accrual (asset-id (string-ascii 32)) (time-elapsed uint))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets { asset-id: asset-id })))
+    (borrow-rate (get borrow-rate market))
+    (total-borrows (get total-borrows market))
+    (interest-factor (/ (* (* borrow-rate time-elapsed) u1) SECONDS_PER_YEAR))  ;; Annualized rate to actual rate
+  )
+    (/ (* total-borrows interest-factor) u10000)  ;; Scale back from basis points
+  )
+)
+
+;; Calculate new index based on rate and time
+(define-private (calculate-new-index (old-index uint) (rate uint) (time-elapsed uint))
+  (let (
+    (interest-factor (+ u10000 (/ (* (* rate time-elapsed) u1) SECONDS_PER_YEAR)))  ;; Annualized rate to actual rate
+  )
+    (/ (* old-index interest-factor) u10000)
+  )
+)
+
+;; Update market data when a deposit occurs
+(define-private (update-market-on-deposit (asset-id (string-ascii 32)) (amount uint))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets { asset-id: asset-id })))
+  )
+    (map-set asset-markets
+      { asset-id: asset-id }
+      (merge market {
+        total-deposits: (+ (get total-deposits market) amount)
+      })
+    )
+  )
+)
