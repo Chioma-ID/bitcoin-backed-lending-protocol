@@ -173,3 +173,31 @@
     )
   )
 )
+
+;; Update market data when a withdrawal occurs
+(define-private (update-market-on-withdraw (asset-id (string-ascii 32)) (amount uint))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets { asset-id: asset-id })))
+  )
+    (map-set asset-markets
+      { asset-id: asset-id }
+      (merge market {
+        total-deposits: (- (get total-deposits market) amount)
+      })
+    )
+  )
+)
+
+;; Update market data when a borrow occurs
+(define-private (update-market-on-borrow (asset-id (string-ascii 32)) (amount uint))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets { asset-id: asset-id })))
+  )
+    (map-set asset-markets
+      { asset-id: asset-id }
+      (merge market {
+        total-borrows: (+ (get total-borrows market) amount)
+      })
+    )
+  )
+)
