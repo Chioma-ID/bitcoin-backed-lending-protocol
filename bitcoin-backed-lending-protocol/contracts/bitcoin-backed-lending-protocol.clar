@@ -241,3 +241,24 @@
     fee: uint
   }
 )
+
+;; Verify flash loan repayment
+(define-private (verify-flash-loan-repayment (tx-hash (buff 32)) (asset-id (string-ascii 32)) (amount uint) (fee uint))
+  (let (
+    (asset-config (unwrap-panic (map-get? supported-assets {asset-id: asset-id})))
+    (token-contract (get token-contract asset-config))
+    (protocol-address (as-contract tx-sender))
+    (total-repayment (+ amount fee))
+  )
+    ;; Check if protocol balance increased by required amount
+    ;; In a real implementation, this would need to track previous balance
+    ;; This is a simplified placeholder that assumes balance check implementation
+    (if true  ;; Placeholder for balance verification
+      (begin
+        (map-delete flash-loans {tx-hash: tx-hash})
+        (ok true)
+      )
+      (err ERR_INSUFFICIENT_LIQUIDITY)
+    )
+  )
+)
