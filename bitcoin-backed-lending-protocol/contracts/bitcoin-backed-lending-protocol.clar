@@ -426,3 +426,30 @@
   }
 )
 
+
+;; 27. New Governance Function: Create Proposal
+(define-public (create-governance-proposal 
+                (proposal-id uint) 
+                (description (string-utf8 256)) 
+                (execution-payload (optional (buff 1024))))
+  (begin
+    ;; Check if caller has enough voting power (would check token balance in real implementation)
+    
+    ;; Store proposal
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      {
+        proposer: tx-sender,
+        description: description,
+        start-block: stacks-block-height,
+        end-block: (+ stacks-block-height u7200), ;; ~1 day at 12 second blocks
+        executed: false,
+        votes-for: u0,
+        votes-against: u0,
+        status: "active",
+        execution-payload: execution-payload
+      })
+    
+    (ok true)
+  )
+)
