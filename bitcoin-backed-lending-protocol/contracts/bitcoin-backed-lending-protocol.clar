@@ -427,7 +427,7 @@
 )
 
 
-;; 27. New Governance Function: Create Proposal
+;; New Governance Function: Create Proposal
 (define-public (create-governance-proposal 
                 (proposal-id uint) 
                 (description (string-utf8 256)) 
@@ -448,6 +448,26 @@
         votes-against: u0,
         status: "active",
         execution-payload: execution-payload
+      })
+    
+    (ok true)
+  )
+)
+
+;; 32. New Function: Set User Liquidation Preferences
+(define-public (set-liquidation-preferences 
+                (self-liquidation bool) 
+                (preferred-repay-asset (optional (string-ascii 32)))
+                (collateral-priority (list 5 (string-ascii 32)))
+                (notification-threshold uint))
+  (begin
+    (map-set user-liquidation-preferences
+      {user: tx-sender}
+      {
+        self-liquidation-enabled: self-liquidation,
+        preferred-repay-asset: preferred-repay-asset,
+        preferred-collateral-priority: collateral-priority,
+        notification-threshold: notification-threshold
       })
     
     (ok true)
