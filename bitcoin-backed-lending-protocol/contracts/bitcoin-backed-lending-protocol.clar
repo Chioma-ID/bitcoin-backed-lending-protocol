@@ -262,3 +262,47 @@
     )
   )
 )
+
+;; Calculate current utilization rate (scaled by 10000)
+(define-private (calculate-utilization-rate (asset-id (string-ascii 32)))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets {asset-id: asset-id})))
+    (total-borrows (get total-borrows market))
+    (total-deposits (get total-deposits market))
+  )
+    (if (is-eq total-deposits u0)
+      u0
+      (/ (* total-borrows u10000) total-deposits)
+    )
+  )
+)
+
+;; Calculate borrow interest rate based on utilization
+(define-private (calculate-borrow-rate (asset-id (string-ascii 32)))
+  (let (
+    (utilization (calculate-utilization-rate asset-id))
+  )
+    (if (<= utilization OPTIMAL_UTILIZATION)
+      ;; Below optimal: BASE_RATE + utilization * RATE_SLOPE_1 / optimal
+      (+ BASE_RATE (/ (* utilization RATE_SLOPE_1) OPTIMAL_UTILIZATION))
+      ;; Above optimal: BASE_RATE + RATE_SLOPE_1 + (utilization - optimal) * RATE_SLOPE_2 / (10000 - optimal)
+      (+ (+ BASE_RATE RATE_SLOPE_1) 
+         (/ (* (- utilization OPTIMAL_UTILIZATION) RATE_SLOPE_2) 
+            (- u10000 OPTIMAL_UTILIZATION)))
+    )
+  )
+)
+
+;; Calculate supply interest rate based on utilization and borrow rate
+(define-private (calculate-supply-rate (asset-id (string-ascii 32)))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets {asset-id: asset-id})))
+    (asset-config (unwrap-panic (map-get? supported-assets {asset-id: asset-id})))
+    (utilization (calculate-utilization-rate asset-id))
+    (borrow-rate (calculate-borrow-rate asset-id))
+    (reserve-factor (get reserve-factor asset-config))
+  )
+    ;; supply-rate = borrow-rate * utilization * (1 - reserve-factor)
+    (/ (* (* borrow-rate utilization) (- u100 reserve-factor)) u1000000)
+  )
+)
