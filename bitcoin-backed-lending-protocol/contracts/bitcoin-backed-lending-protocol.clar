@@ -391,7 +391,7 @@
   }
 )
 
-;; 14. Yield Strategies
+;; Yield Strategies
 (define-map yield-strategies
   { asset-id: (string-ascii 32) }
   {
@@ -401,4 +401,75 @@
     performance-fee: uint,        ;; Fee taken from yield generated
     last-harvest: uint            ;; Last time yield was collected
   }
+)
+
+;; Insurance Fund
+(define-data-var insurance-fund-balance uint u0)
+(define-data-var insurance-fund-asset (string-ascii 32) "USDA")
+
+;; Protocol Reserves
+(define-map protocol-reserves
+  { asset-id: (string-ascii 32) }
+  {
+    balance: uint,
+    last-sweep: uint  ;; Last time reserves were moved to treasury
+  }
+)
+
+;; Fee Discount Tiers
+(define-map fee-discount-tiers
+  { tier: uint }
+  {
+    min-token-balance: uint,
+    borrow-discount: uint,      ;; Discount on borrow fees in basis points
+    liquidation-discount: uint  ;; Discount on liquidation fees
+  }
+)
+
+
+;; New Governance Function: Create Proposal
+(define-public (create-governance-proposal 
+                (proposal-id uint) 
+                (description (string-utf8 256)) 
+                (execution-payload (optional (buff 1024))))
+  (begin
+    ;; Check if caller has enough voting power (would check token balance in real implementation)
+    
+    ;; Store proposal
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      {
+        proposer: tx-sender,
+        description: description,
+        start-block: stacks-block-height,
+        end-block: (+ stacks-block-height u7200), ;; ~1 day at 12 second blocks
+        executed: false,
+        votes-for: u0,
+        votes-against: u0,
+        status: "active",
+        execution-payload: execution-payload
+      })
+    
+    (ok true)
+  )
+)
+
+;; 32. New Function: Set User Liquidation Preferences
+(define-public (set-liquidation-preferences 
+                (self-liquidation bool) 
+                (preferred-repay-asset (optional (string-ascii 32)))
+                (collateral-priority (list 5 (string-ascii 32)))
+                (notification-threshold uint))
+  (begin
+    (map-set user-liquidation-preferences
+      {user: tx-sender}
+      {
+        self-liquidation-enabled: self-liquidation,
+        preferred-repay-asset: preferred-repay-asset,
+        preferred-collateral-priority: collateral-priority,
+        notification-threshold: notification-threshold
+      })
+    
+    (ok true)
+  )
 )
