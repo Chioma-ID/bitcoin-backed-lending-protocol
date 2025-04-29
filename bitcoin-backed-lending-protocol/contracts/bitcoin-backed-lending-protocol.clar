@@ -391,7 +391,7 @@
   }
 )
 
-;; 14. Yield Strategies
+;; Yield Strategies
 (define-map yield-strategies
   { asset-id: (string-ascii 32) }
   {
@@ -402,3 +402,27 @@
     last-harvest: uint            ;; Last time yield was collected
   }
 )
+
+;; Insurance Fund
+(define-data-var insurance-fund-balance uint u0)
+(define-data-var insurance-fund-asset (string-ascii 32) "USDA")
+
+;; Protocol Reserves
+(define-map protocol-reserves
+  { asset-id: (string-ascii 32) }
+  {
+    balance: uint,
+    last-sweep: uint  ;; Last time reserves were moved to treasury
+  }
+)
+
+;; Fee Discount Tiers
+(define-map fee-discount-tiers
+  { tier: uint }
+  {
+    min-token-balance: uint,
+    borrow-discount: uint,      ;; Discount on borrow fees in basis points
+    liquidation-discount: uint  ;; Discount on liquidation fees
+  }
+)
+
