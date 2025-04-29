@@ -201,3 +201,19 @@
     )
   )
 )
+
+;; Get list of user collateral assets
+(define-private (get-user-collateral-assets (user principal))
+
+  (list 
+    {asset-id: "STX", is-collateral: true}
+    {asset-id: "BTC", is-collateral: false}
+  )
+)
+
+;; Get list of user borrowed assets
+(define-private (get-user-borrow-assets (user principal))
+
+  (list "USDA" "STX")
+)
+
