@@ -323,7 +323,7 @@
 ;; Fee recipient
 (define-data-var fee-recipient principal tx-sender)
 
-;; 7. User Health Factor Tracking
+;; User Health Factor Tracking
 (define-map user-health
   { user: principal }
   {
@@ -335,7 +335,7 @@
 )
 
 
-;; 8. Governance System
+;;  Governance System
 (define-map governance-proposals
   { proposal-id: uint }
   {
@@ -351,7 +351,7 @@
   }
 )
 
-;; 9. User Governance Votes
+;;  User Governance Votes
 (define-map governance-votes
   { user: principal, proposal-id: uint }
   {
@@ -360,7 +360,7 @@
   }
 )
 
-;; 10. Reward Distribution System
+;; Reward Distribution System
 (define-map reward-distribution
   { asset-id: (string-ascii 32) }
   {
@@ -368,5 +368,25 @@
     emission-rate: uint,      ;; Tokens per block
     reward-index: uint,       ;; Global index for reward accrual
     last-update-block: uint
+  }
+)
+
+;; User Reward Claims
+(define-map user-rewards
+  { user: principal, reward-token: principal }
+  {
+    accrued: uint,
+    claimed: uint
+  }
+)
+
+;; 13. User Liquidation Preferences
+(define-map user-liquidation-preferences
+  { user: principal }
+  {
+    self-liquidation-enabled: bool,   ;; Allow auto-liquidation to maintain health
+    preferred-repay-asset: (optional (string-ascii 32)),
+    preferred-collateral-priority: (list 5 (string-ascii 32)),
+    notification-threshold: uint      ;; Health factor threshold for notifications
   }
 )
