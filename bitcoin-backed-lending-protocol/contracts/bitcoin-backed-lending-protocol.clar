@@ -380,7 +380,7 @@
   }
 )
 
-;; 13. User Liquidation Preferences
+;; User Liquidation Preferences
 (define-map user-liquidation-preferences
   { user: principal }
   {
@@ -388,5 +388,17 @@
     preferred-repay-asset: (optional (string-ascii 32)),
     preferred-collateral-priority: (list 5 (string-ascii 32)),
     notification-threshold: uint      ;; Health factor threshold for notifications
+  }
+)
+
+;; 14. Yield Strategies
+(define-map yield-strategies
+  { asset-id: (string-ascii 32) }
+  {
+    strategy-contract: principal,
+    allocation-percentage: uint,  ;; % of reserves allocated to this strategy
+    active: bool,
+    performance-fee: uint,        ;; Fee taken from yield generated
+    last-harvest: uint            ;; Last time yield was collected
   }
 )
