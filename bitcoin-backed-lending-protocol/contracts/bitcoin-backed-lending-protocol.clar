@@ -306,3 +306,47 @@
     (/ (* (* borrow-rate utilization) (- u100 reserve-factor)) u1000000)
   )
 )
+
+;; Enhanced Error Codes
+(define-constant ERR_PAUSED u10)
+(define-constant ERR_COLLATERAL_ALREADY_ENABLED u11)
+(define-constant ERR_COLLATERAL_NOT_ENABLED u12)
+(define-constant ERR_MAX_BORROWS_EXCEEDED u13)
+(define-constant ERR_FLASH_LOAN_CALLBACK_FAILED u14)
+(define-constant ERR_FLASH_LOAN_NOT_REPAID u15)
+(define-constant ERR_GOVERNANCE_PROPOSAL_INACTIVE u16)
+(define-constant ERR_GOVERNANCE_VOTE_ALREADY_CAST u17)
+(define-constant ERR_REWARDS_CLAIM_FAILED u18)
+(define-constant ERR_VAULT_STRATEGY_FAILED u19)
+(define-constant ERR_ORACLE_STALE_PRICE u20)
+
+;; Fee recipient
+(define-data-var fee-recipient principal tx-sender)
+
+;; 7. User Health Factor Tracking
+(define-map user-health
+  { user: principal }
+  {
+    health-factor: uint,          ;; Current health factor (collateral value / loan value) * 100
+    last-updated: uint,           ;; Timestamp of last update
+    total-collateral-value: uint, ;; Total value of all collateral
+    total-borrow-value: uint      ;; Total value of all borrows
+  }
+)
+
+
+;; 8. Governance System
+(define-map governance-proposals
+  { proposal-id: uint }
+  {
+    proposer: principal,
+    description: (string-utf8 256),
+    start-block: uint,
+    end-block: uint,
+    executed: bool,
+    votes-for: uint,
+    votes-against: uint,
+    status: (string-ascii 20), ;; "active", "passed", "failed", "executed"
+    execution-payload: (optional (buff 1024))
+  }
+)
