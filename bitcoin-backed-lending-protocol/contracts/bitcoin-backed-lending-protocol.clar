@@ -217,3 +217,18 @@
   (list "USDA" "STX")
 )
 
+;; Helper for market updates on repay
+(define-private (update-market-on-repay (asset-id (string-ascii 32)) (amount uint))
+  (let (
+    (market (unwrap-panic (map-get? asset-markets {asset-id: asset-id})))
+  )
+    (map-set asset-markets
+      {asset-id: asset-id}
+      (merge market {
+        total-borrows: (- (get total-borrows market) amount)
+      })
+    )
+  )
+)
+
+
