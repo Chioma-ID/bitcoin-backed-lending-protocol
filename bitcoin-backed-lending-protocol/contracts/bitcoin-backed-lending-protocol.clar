@@ -231,4 +231,13 @@
   )
 )
 
-
+;; Flash loan data structure to track outstanding loans
+(define-map flash-loans
+  {tx-hash: (buff 32)}
+  {
+    borrower: principal,
+    asset-id: (string-ascii 32),
+    amount: uint,
+    fee: uint
+  }
+)
