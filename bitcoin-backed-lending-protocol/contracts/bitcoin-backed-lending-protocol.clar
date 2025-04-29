@@ -350,3 +350,23 @@
     execution-payload: (optional (buff 1024))
   }
 )
+
+;; 9. User Governance Votes
+(define-map governance-votes
+  { user: principal, proposal-id: uint }
+  {
+    amount: uint,
+    support: bool
+  }
+)
+
+;; 10. Reward Distribution System
+(define-map reward-distribution
+  { asset-id: (string-ascii 32) }
+  {
+    reward-token: principal,
+    emission-rate: uint,      ;; Tokens per block
+    reward-index: uint,       ;; Global index for reward accrual
+    last-update-block: uint
+  }
+)
